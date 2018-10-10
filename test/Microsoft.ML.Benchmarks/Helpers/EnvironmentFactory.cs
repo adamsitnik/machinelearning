@@ -5,6 +5,9 @@
 using Microsoft.ML.Core.Data;
 using Microsoft.ML.Runtime;
 using Microsoft.ML.Runtime.Data;
+using System.Globalization;
+using System.IO;
+using System.Threading;
 
 namespace Microsoft.ML.Benchmarks
 {
@@ -20,6 +23,8 @@ namespace Microsoft.ML.Benchmarks
             environment.ComponentCatalog.RegisterAssembly(typeof(TLoader).Assembly);
             environment.ComponentCatalog.RegisterAssembly(typeof(TTransformer).Assembly);
             environment.ComponentCatalog.RegisterAssembly(typeof(TTrainer).Assembly);
+
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
             return environment;
         }
@@ -38,6 +43,8 @@ namespace Microsoft.ML.Benchmarks
             environment.ComponentCatalog.RegisterAssembly(typeof(TTrainer).Assembly);
 
             environment.ComponentCatalog.RegisterAssembly(typeof(NAHandleTransform).Assembly);
+
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
 
             return environment;
         }
