@@ -13,9 +13,24 @@ namespace Microsoft.ML.Benchmarks
         {
             Add(DefaultConfig.Instance); // this config contains all of the basic settings (exporters, columns etc)
 
-            Add(GetJobDefinition() // job defines how many times given benchmark should be executed
-                .WithCustomBuildConfiguration(GetBuildConfigurationName())
-                .With(CreateToolchain())); // toolchain is responsible for generating, building and running dedicated executable per benchmark
+            Add(GetJobDefinition()
+                .WithCustomBuildConfiguration("Release")
+                .With(CreateToolchain("netcoreapp2.1", null))
+                .WithId("Core 2.1")
+                .AsBaseline());
+
+            Add(GetJobDefinition()
+                .WithCustomBuildConfiguration("Release-Intrinsics")
+                .With(new EnvironmentVariable[] { new EnvironmentVariable("COMPlus_TieredCompilation", "0") })
+                .With(CreateToolchain("netcoreapp3.0", @"C:\Projects\machinelearning\Tools\dotnetcli\dotnet.exe"))
+                .WithId("Core 3.0 NonTiered"));
+
+
+            //Add(GetJobDefinition()
+            //    .WithCustomBuildConfiguration("Release-Intrinsics")
+            //    .With(new EnvironmentVariable[] { new EnvironmentVariable("COMPlus_TieredCompilation", "1") })
+            //    .With(CreateToolchain("netcoreapp3.0", @"C:\Projects\machinelearning\Tools\dotnetcli\dotnet.exe"))
+            //    .WithId("Core 3.0 Tiered"));
 
             Add(new ExtraMetricColumn()); // an extra colum that can display additional metric reported by the benchmarks
 
@@ -32,10 +47,9 @@ namespace Microsoft.ML.Benchmarks
         /// <summary>
         /// we need our own toolchain because MSBuild by default does not copy recursive native dependencies to the output
         /// </summary>
-        private IToolchain CreateToolchain()
+        private IToolchain CreateToolchain(string tfm, string cliPath)
         {
-            var tfm = GetTargetFrameworkMoniker();
-            var csProj = CsProjCoreToolchain.From(new NetCoreAppSettings(targetFrameworkMoniker: tfm, runtimeFrameworkVersion: null, name: tfm));
+            var csProj = CsProjCoreToolchain.From(new NetCoreAppSettings(targetFrameworkMoniker: tfm, runtimeFrameworkVersion: null, name: tfm, customDotNetCliPath: cliPath));
 
             return new Toolchain(
                 tfm,
