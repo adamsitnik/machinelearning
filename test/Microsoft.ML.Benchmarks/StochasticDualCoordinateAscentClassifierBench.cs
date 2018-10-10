@@ -4,6 +4,7 @@
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
+using Microsoft.ML.Legacy;
 using Microsoft.ML.Legacy.Models;
 using Microsoft.ML.Legacy.Trainers;
 using Microsoft.ML.Legacy.Transforms;
@@ -11,6 +12,7 @@ using Microsoft.ML.Runtime;
 using Microsoft.ML.Runtime.Api;
 using Microsoft.ML.Runtime.Data;
 using Microsoft.ML.Runtime.Learners;
+using Microsoft.ML.Runtime.PipelineInference;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -63,6 +65,9 @@ namespace Microsoft.ML.Benchmarks
         {
             using (var env = new ConsoleEnvironment(seed: 1))
             {
+                env.ComponentCatalog.RegisterAssembly(typeof(LearningPipeline).Assembly);
+                env.ComponentCatalog.RegisterAssembly(typeof(TransformInference).Assembly);
+
                 // Pipeline
                 var loader = TextLoader.ReadFile(env,
                     new TextLoader.Arguments()
