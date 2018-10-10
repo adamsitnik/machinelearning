@@ -20,6 +20,8 @@ namespace Microsoft.ML.Benchmarks
             Add(new ExtraMetricColumn()); // an extra colum that can display additional metric reported by the benchmarks
 
             UnionRule = ConfigUnionRule.AlwaysUseLocal; // global config can be overwritten with local (the one set via [ConfigAttribute])
+
+            Add(new BenchmarkDotNet.Diagnostics.Windows.EtwProfiler(new BenchmarkDotNet.Diagnostics.Windows.EtwProfilerConfig(false, cpuSampleIntervalInMiliseconds: 1.0f)));
         }
 
         protected virtual Job GetJobDefinition()
